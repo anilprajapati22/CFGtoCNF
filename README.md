@@ -47,7 +47,7 @@ The routine follows [Wikipedia](https://en.wikipedia.org/wiki/Chomsky_normal_for
 
 ## 4 improoved part
 
-**DEL** remove eplilone production
-**TERM** 
-**you can mathch both result from old project and my**
+1. **DEL** remove eplilone production
+2. **TERM** 
+3. **you can mathch both result from old project and my**
 
