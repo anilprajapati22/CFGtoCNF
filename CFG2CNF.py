@@ -31,6 +31,7 @@ def START(productions, variables):
 def TERM(productions, variables):
 	newProductions = []
 	#create a dictionari for all base production, like A->a, in the form dic['a'] = 'A'
+	#[('S', ['A', 'S', 'A']), ('S', ['a', 'B']), ('A', ['B']), ('A', ['S']), ('B', ['e']), ('B', ['b', ''])]
 	dictionary = helper.setupDict(productions, variables, terms=K)
 	for production in productions:
 		#check if the production is simple
@@ -84,19 +85,28 @@ def DEL(productions):
 	#        – outlaws all left side of productions such that right side is equal to the outlaw
 	#        – productions the productions without outlaws 
 	outlaws, productions = helper.seekAndDestroy(target='e', productions=productions)
+	#print("outlaws  ",outlaws)
+	#print("pro  ",productions)
 	#add new reformulation of old rules
 	for outlaw in outlaws:
 		#consider every production: old + new resulting important when more than one outlaws are in the same prod.
+		#print("\n\nsgn ::",productions)
 		for production in productions + [e for e in newSet if e not in productions]:
 			#if outlaw is present in the right side of a rule
 			if outlaw in production[right]:
 				#the rule is rewrited in all combination of it, rewriting "e" rather than outlaw
 				#this cycle prevent to insert duplicate rules
 				newSet = newSet + [e for e in  helper.rewrite(outlaw, production) if e not in newSet]
+				for i in newSet:
+					if len(i[right]) == 1:
+						if (i[right][0]==outlaw):
+							i[right][0] = 'e'						
+				#print("\n\nnewset :: ",newSet)
 
 	#add unchanged rules and return
-	return newSet + ([productions[i] for i in range(len(productions)) 
+	newSet= newSet + ([productions[i] for i in range(len(productions)) 
 							if productions[i] not in newSet])
+	return newSet
 
 def unit_routine(rules, variables):
 	unitaries, result = [], []
@@ -132,14 +142,45 @@ if __name__ == '__main__':
 		modelPath = 'model.txt'
 	
 	K, V, Productions = helper.loadModel( modelPath )
-
+	#k=[a,b]   
+	#V=[S,A,B]
+	#[('S', ['A', 'S', 'A']), ('S', ['a', 'B']), ('A', ['B']), ('A', ['S']), ('B', ['e']), ('B', ['b', ''])]
+	for i in Productions:
+		if "" in i[1]:
+			i[1].remove("")
+	#[('S', ['A', 'S', 'A']), ('S', ['a', 'B']), ('A', ['B']), ('A', ['S']), ('B', ['e']), ('B', ['b'])]		
+	print("add start function")
 	Productions = START(Productions, variables=V)
-	Productions = TERM(Productions, variables=V)
-	Productions = BIN(Productions, variables=V)
-	Productions = DEL(Productions)
-	Productions = UNIT(Productions, variables=V)
-	
 	print( helper.prettyForm(Productions) )
-	print( len(Productions) )
+	####################
+	print("remove terminals from rightside")
+	Productions = TERM(Productions, variables=V)
+	print( helper.prettyForm(Productions) )
+	##############
+	print("remove more than 2")
+	Productions = BIN(Productions, variables=V)
+	print( helper.prettyForm(Productions) )
+	#######
+	c=[]	
+	
+	for i in Productions:
+		c+=i[1]		
+	while 'e' in c:
+		print("remove NUll")	
+		Productions = DEL(Productions)
+		print( helper.prettyForm(Productions) )
+		c=[]
+		for i in Productions:
+			c+=i[1]		
+
+	#######
+	print("remove unite production")
+	Productions = UNIT(Productions, variables=V)
+	pnew=[]
+	for i in Productions:
+		if i not in pnew:
+			pnew.append(i)
+	print( helper.prettyForm(pnew) )
+	print( len(pnew) )
 	open('out.txt', 'w').write(	helper.prettyForm(Productions) )
 

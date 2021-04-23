@@ -1,22 +1,25 @@
 # CFG2CNF
 ### Python tool able to convert a Context Free Grammar in Chomsky Normal Form
-it's modified version of this project
-Link : [LInk](https://github.com/adelmassimo/CFG2CNF)
+
 ## 1 Goals
 The main purpose of this project is to provide a strategy for converting a Context Free Grammar in his Chomsky Normal Form
 
 ## 2 How to use
-The script must be called in a form like ``python CFG2CNF.py sgninput.txt``, and it produces an ``out.txt`` file.
+The script must be called in a form like ``CFG2CNF.py model.txt``, and it produces an ``out.txt`` file.
 The Grammar G=(V, T, P, S) is read by a `.txt` file, so need a certain formattation, that follow:
 ```
 Terminals:
-a b        //small letters 
++ - ( ) ^ number variable
 Variables:
-A B C     // capital non-terminals
+Expr Term AddOp MulOp Factor Primary
 Productions:
-S -> A S A | a B;
-A -> B | S;
-B -> e | b 
+Expr -> Term | Expr AddOp Term | AddOp Term;
+Term -> Factor | Term MulOp Factor;
+Factor -> Primary | Factor ^ Primary;
+Primary -> number | variable;
+Primary -> ( Expr );
+AddOp -> + | -;
+MulOp -> * | /
 ```
 Is important to:
 * Use spaces between symbols, one space, not more
@@ -26,14 +29,21 @@ Where is obvious how T, V and P are loaded (text after *Terminals/Variables/Prod
 **N.B.** the ε-rule symbol is fixed and it's simplly ``e``
 The output corresponding to the above example is:
 ```
-S -> Z B | A A1 | a
-A1 -> S A
-Z -> a
-Y -> b
-B -> Y 
-A -> Y  | Z B | A A1 | a
-S0 -> Z B | A A1 | a
-
+AddOp -> + | -
+Term -> Term B1 | Primary | Factor C1
+MulOp -> * | /
+Expr -> Expr A1 | AddOp Term | Term B1 | Primary | Factor C1
+S0 -> Expr A1 | AddOp Term | Term B1 | Primary | Factor C1
+Primary -> Y | variable | X D1
+A1 -> AddOp Term
+B1 -> MulOp Factor
+W -> )
+Factor -> Primary | Factor C1
+Y -> number
+X -> (
+C1 -> Z Primary
+Z -> ^
+D1 -> Expr W
 ```
 
 ## 3 The Routine
@@ -45,9 +55,9 @@ The routine follows [Wikipedia](https://en.wikipedia.org/wiki/Chomsky_normal_for
 5. **UNIT**: remove all production which the right side is only a variable
 
 
-## 4 improoved part
-
-1. **DEL** remove eplilone production
-2. **TERM** 
-3. **you can mathch both result from old project and my**
-
+## 4 Known Bugs
+* New variables (like `C1` and `Z` in `C1 -> Z Primary`) are introduced using a fixed and coded set:
+```
+variablesJar = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "W", "X", "Y", "Z"]
+```
+This strategy could result a limit in vision of a big computation, but it's easily avoidable adding symbols

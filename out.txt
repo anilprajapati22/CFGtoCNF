@@ -1,7 +1,6 @@
-S -> Z B | A A1 | a
-A1 -> S A
+S -> A A1 | Z B | S A | a
+A1 -> S A | A A1 | Z B | a
 Z -> a
-Y -> b
-B -> Y 
-A -> Y  | Z B | A A1 | a
-S0 -> Z B | A A1 | a
+B -> b
+S0 -> A A1 | Z B | S A | A A1 | Z B | a | S A | A A1 | Z B | a | a
+A -> b | A A1 | Z B | S A | A A1 | Z B | a | S A | A A1 | Z B | a | a

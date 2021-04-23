@@ -3,8 +3,7 @@ a b
 Variables:
 S A B
 Productions:
-S -> A S A | a B;
-A -> B | S;
-B -> e | b 
-
+S -> a A | B b;
+A -> e | S;
+B -> b B | b 
 
